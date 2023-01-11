@@ -116,7 +116,14 @@ public class BusinessLayer implements gestionUsersInterface, gestionProduitsInte
         return dataLayer.isAdmin(user);
     }
 
-    public void saveOrder(Order order) {
-        dataLayer.saveOrder(order);
+    public void saveOrder(Order order, ArrayList<Product> orderItems) {
+        int orderId = dataLayer.saveOrder(order);
+        for (Product item : orderItems)
+            dataLayer.saveOrderItems(orderId, item);
+    }
+
+    public void updateOrderStatus(Order order) {
+        dataLayer.updateOrderStatus(order);
+
     }
 }

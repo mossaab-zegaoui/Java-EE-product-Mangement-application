@@ -33,7 +33,7 @@ public class DataLayer {
     public ArrayList<Product> listAllProducts() {
         connectionDB();
         ArrayList<Product> products = new ArrayList<>();
-        String query = "SELECT * FROM product ORDER BY created_at desc LIMIT 9";
+        String query = "SELECT * FROM product ORDER BY created_at desc LIMIT 15";
         try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
                 Product product = new Product();
@@ -188,7 +188,7 @@ public class DataLayer {
             rowInserted = prepareStatement.executeUpdate() > 0;
             disconnectionDB();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return rowInserted;
     }
@@ -377,7 +377,7 @@ public class DataLayer {
     public ArrayList<Product> getUserOrders(int id) {
         connectionDB();
         ArrayList<Product> userOrders = new ArrayList<>();
-        String request = "SELECT p.name, p.status, m.order_date, m.order_total_price FROM order_items o, product p, magasin.order m WHERE p.id = o.product_id  AND o.order_id = m.id AND m.user_id = ? ORDER BY m.order_date DESC ";
+        String request = "SELECT m.id, p.name, m.status, m.order_date, m.order_total_price FROM order_items o, product p, magasin.order m WHERE p.id = o.product_id  AND o.order_id = m.id AND m.user_id = ? ORDER BY m.order_date DESC ";
         try (PreparedStatement preparedStatement = connection.prepareStatement(request)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -387,6 +387,7 @@ public class DataLayer {
                 product.setCreated_at(resultSet.getDate("order_date"));
                 product.setPrice(resultSet.getDouble("order_total_price"));
                 product.setStatus(resultSet.getString("status"));
+                product.setId(resultSet.getInt("id"));
                 userOrders.add(product);
             }
             disconnectionDB();
@@ -432,25 +433,49 @@ public class DataLayer {
         }
     }
 
-    public void saveOrder(Order order) {
+    public int saveOrder(Order order) {
         connectionDB();
-        int id;
+        int id = 0;
         try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO magasin.order(user_id, order_total_price) VALUES (?, ?)")) {
             preparedStatement.setInt(1, order.getId());
             preparedStatement.setDouble(2, order.getOrderTotalPrice());
             preparedStatement.executeUpdate();
-            PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT id FROM magasin.order WHERE user_id = ?");
+            PreparedStatement preparedStatement2 = connection.prepareStatement("SELECT id FROM magasin.order WHERE user_id = ? ORDER BY order_date DESC LIMIT 1");
             preparedStatement2.setInt(1, order.getId());
             ResultSet resultSet = preparedStatement2.executeQuery();
-            while (resultSet.next()) {
+            if (resultSet.next())
                 id = resultSet.getInt("id");
-            }
             disconnectionDB();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return id;
     }
 
+    public void saveOrderItems(int orderId, Product orderItems) {
+        connectionDB();
+        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO order_items(order_id, product_id, quantity) VALUES (?, ?, ?)")) {
+            preparedStatement.setInt(1, orderId);
+            preparedStatement.setInt(2, orderItems.getId());
+            preparedStatement.setInt(3, orderItems.getQuantity());
+            preparedStatement.executeUpdate();
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        disconnectionDB();
+    }
+
+    public void updateOrderStatus(Order order) {
+        connectionDB();
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE magasin.order SET status = ? WHERE id = ?")) {
+            preparedStatement.setString(1, order.getOrderStatus());
+            preparedStatement.setInt(2, order.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        disconnectionDB();
+    }
 }

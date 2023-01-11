@@ -23,13 +23,13 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <a href="AdminController?action=newProduct" class="btn btn-primary-gradien mb-2">add product</a>
+                        <a href="AdminController?action=newProduct" class="btn btn-outline-primary mb-2">add product</a>
                         <div class="table-responsive product-table">
                             <table class="display" id="basic-1">
                                 <thead>
                                 <tr>
                                     <th>Image</th>
-                                    <th>Details</th>
+                                    <th>Name</th>
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Start date</th>
@@ -43,7 +43,7 @@
                                     <tr>
                                         <td><img src="images/${product.image}" width="50" height="50"></td>
                                         <td>
-                                            <p> ${product.description}</p>
+                                            <p> ${product.name}</p>
                                         </td>
                                         <td>$ ${product.price}</td>
                                         <td>

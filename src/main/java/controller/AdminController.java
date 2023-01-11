@@ -5,6 +5,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import businessLayer.BusinessLayer;
 import models.Category;
+import models.Order;
 import models.Product;
 import models.User;
 
@@ -60,7 +61,19 @@ public class AdminController extends HttpServlet {
             case "listOrders":
                 listOrders(request, response);
                 break;
+
         }
+    }
+
+    private void updateOrderStatus(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        int userId = Integer.parseInt(request.getParameter("user_id"));
+        String status = request.getParameter("status");
+        Order order = new Order();
+        order.setId(id);
+        order.setOrderStatus(status);
+        businessLayer.updateOrderStatus(order);
+        response.sendRedirect(request.getRequestURI() + "?action=editUser&id=" + userId);
     }
 
 
@@ -87,6 +100,9 @@ public class AdminController extends HttpServlet {
                 break;
             case "deleteUser":
                 deleteUser(request, response);
+                break;
+            case "update_order_status":
+                updateOrderStatus(request, response);
                 break;
         }
     }
@@ -133,8 +149,10 @@ public class AdminController extends HttpServlet {
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         User user = new User(login, pasword, email, firstName, lastName);
-        businessLayer.saveUser(user);
-        request.setAttribute("successMessage", "user has been added");
+        if (!businessLayer.existLogin(user)) {
+            businessLayer.saveUser(user);
+            request.setAttribute("message", "account had been created");
+        }
         listUsers(request, response);
     }
 
