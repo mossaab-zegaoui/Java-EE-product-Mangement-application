@@ -1,7 +1,5 @@
 package businessLayer;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import models.Category;
 import models.Product;
 
@@ -24,7 +22,7 @@ public interface gestionProduitsInterface {
 
     ArrayList<Product> shippedOrders();
 
-    ArrayList<Product> getUserOrders(int id);
+    ArrayList<Product> userCompletedOrders(int id);
 
     ArrayList<Product> cancelledOrders();
 

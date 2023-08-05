@@ -61,7 +61,6 @@ public class AdminController extends HttpServlet {
             case "listOrders":
                 listOrders(request, response);
                 break;
-
         }
     }
 
@@ -107,7 +106,8 @@ public class AdminController extends HttpServlet {
         }
     }
 
-    //    Orders
+//    Orders
+
     private void listOrders(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ArrayList<Product> processingOrders;
         ArrayList<Product> shippedOrders;
@@ -131,7 +131,7 @@ public class AdminController extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         User existingUser = businessLayer.selectUser(id);
         request.setAttribute("user", existingUser);
-        ArrayList<Product> userOrders = businessLayer.getUserOrders(id);
+        ArrayList<Product> userOrders = businessLayer.allUserOrders(id);
         request.setAttribute("userOrders", userOrders);
         request.getRequestDispatcher("userForm.jsp").forward(request, response);
     }

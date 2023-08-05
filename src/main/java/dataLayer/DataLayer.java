@@ -374,10 +374,10 @@ public class DataLayer {
         return cancelledOrder;
     }
 
-    public ArrayList<Product> getUserOrders(int id) {
+    public ArrayList<Product> getUserCompletedOrders(int id) {
         connectionDB();
         ArrayList<Product> userOrders = new ArrayList<>();
-        String request = "SELECT m.id, p.name, m.status, m.order_date, m.order_total_price FROM order_items o, product p, magasin.order m WHERE p.id = o.product_id  AND o.order_id = m.id AND m.user_id = ? ORDER BY m.order_date DESC ";
+        String request = "SELECT m.id, p.name, m.status, m.order_date, m.order_total_price FROM order_items o, product p, magasin.order m WHERE p.id = o.product_id  AND o.order_id = m.id AND m.user_id = ?  AND m.status = 'completed' ORDER BY m.order_date DESC ";
         try (PreparedStatement preparedStatement = connection.prepareStatement(request)) {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -395,6 +395,30 @@ public class DataLayer {
             e.printStackTrace();
         }
         return userOrders;
+    }
+
+    public ArrayList<Product> getUserOngoingdOrders(int id) {
+        connectionDB();
+        ArrayList<Product> userOrders = new ArrayList<>();
+        String request = "SELECT m.id, p.name, m.status, m.order_date, m.order_total_price FROM order_items o, product p, magasin.order m WHERE p.id = o.product_id  AND o.order_id = m.id AND m.user_id = ?  AND m.status = 'pending' ORDER BY m.order_date DESC ";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Product product = new Product();
+                product.setName(resultSet.getString("name"));
+                product.setCreated_at(resultSet.getDate("order_date"));
+                product.setPrice(resultSet.getDouble("order_total_price"));
+                product.setStatus(resultSet.getString("status"));
+                product.setId(resultSet.getInt("id"));
+                userOrders.add(product);
+            }
+            disconnectionDB();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userOrders;
+
     }
 
     public ArrayList<Category> listAllCategories() {
@@ -477,5 +501,29 @@ public class DataLayer {
             throw new RuntimeException(e);
         }
         disconnectionDB();
+    }
+
+
+    public ArrayList<Product> getAllUserOrders(int id) {
+        connectionDB();
+        ArrayList<Product> userOrders = new ArrayList<>();
+        String request = "SELECT m.id, p.name, m.status, m.order_date, m.order_total_price FROM order_items o, product p, magasin.order m WHERE p.id = o.product_id  AND o.order_id = m.id AND m.user_id = ? ORDER BY m.order_date DESC ";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(request)) {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Product product = new Product();
+                product.setName(resultSet.getString("name"));
+                product.setCreated_at(resultSet.getDate("order_date"));
+                product.setPrice(resultSet.getDouble("order_total_price"));
+                product.setStatus(resultSet.getString("status"));
+                product.setId(resultSet.getInt("id"));
+                userOrders.add(product);
+            }
+            disconnectionDB();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userOrders;
     }
 }

@@ -56,6 +56,9 @@ public class BusinessLayer implements gestionUsersInterface, gestionProduitsInte
     public ArrayList<Product> cancelledOrders() {
         return dataLayer.getcancelledOrders();
     }
+    public ArrayList<Product> allUserOrders(int id) {
+        return dataLayer.getAllUserOrders(id);
+    }
 
     @Override
     public ArrayList<Category> listAllCategories() {
@@ -63,9 +66,13 @@ public class BusinessLayer implements gestionUsersInterface, gestionProduitsInte
     }
 
     @Override
-    public ArrayList<Product> getUserOrders(int id) {
-        return dataLayer.getUserOrders(id);
+    public ArrayList<Product> userCompletedOrders(int id) {
+        return dataLayer.getUserCompletedOrders(id);
     }
+    public ArrayList<Product> userOngoingOrders(int id) {
+        return dataLayer.getUserOngoingdOrders(id);
+    }
+
 
 
     @Override
@@ -126,4 +133,6 @@ public class BusinessLayer implements gestionUsersInterface, gestionProduitsInte
         dataLayer.updateOrderStatus(order);
 
     }
+
+
 }
